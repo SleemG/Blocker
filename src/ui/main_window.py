@@ -18,6 +18,8 @@ from .ui_components import (FloatingButton, FloatingButtonManager,
                           CustomNotification, FloatingPanel, ToggleSwitch)
 from .partner_dialog import PartnerDialog
 from .app_selector import ProgramLoader, ProgramListItem
+from ..utils.adult_content_blocker import (get_blocker_instance, start_content_blocking, 
+                                         stop_content_blocking, is_content_blocking_active)
 
 
 class MainWindow(QMainWindow):
