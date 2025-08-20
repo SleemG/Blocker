@@ -1,0 +1,327 @@
+import sqlite3
+from typing import Optional, Tuple
+
+class Database:
+    def __init__(self, db_path: str = 'app_blocker.db'):
+        self.db_path = db_path
+
+    def create_tables(self):
+        """Create all necessary database tables"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                # Create verification codes table
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS verification_codes (
+                        email TEXT PRIMARY KEY,
+                        code TEXT,
+                        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                ''')
+                
+                # Create users table
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS users (
+                        email TEXT PRIMARY KEY,
+                        username TEXT,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                ''')
+                
+                # Create partners table
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS partners (
+                        user_email TEXT PRIMARY KEY,
+                        partner_name TEXT NOT NULL,
+                        partner_email TEXT NOT NULL,
+                        added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_email) REFERENCES users (email)
+                    )
+                ''')
+                
+                # Create blocked items table
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS blocked_items (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        email TEXT,
+                        item TEXT,
+                        type TEXT CHECK(type IN ('block', 'white')),
+                        item_type TEXT CHECK(item_type IN ('website', 'app')),
+                        FOREIGN KEY (email) REFERENCES users (email),
+                        UNIQUE(email, item)
+                    )
+                ''')
+
+                # Add focus mode table
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS focus_modes (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_email TEXT NOT NULL,
+                        title TEXT NOT NULL,
+                        description TEXT,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        duration INTEGER,  -- in minutes
+                        FOREIGN KEY (user_email) REFERENCES users (email)
+                    )
+                ''')
+                cursor.execute('SELECT email, username FROM users WHERE email = ?', (email,))
+                return cursor.fetchone()
+                
+    def add_partner(self, user_email: str, partner_name: str, partner_email: str) -> bool:
+        """Add or update accountability partner for a user"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                # Check if partner email exists in users table
+                cursor.execute('SELECT email FROM users WHERE email = ?', (partner_email,))
+                if not cursor.fetchone():
+                    return False  # Partner must be a registered user
+                
+                # Add or update partner
+                cursor.execute('''
+                    INSERT OR REPLACE INTO partners (user_email, partner_name, partner_email)
+                    VALUES (?, ?, ?)
+                ''', (user_email, partner_name, partner_email))
+                
+                return True
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
+            return False
+            
+    def get_partner_info(self, user_email: str) -> Optional[Tuple[str, str]]:
+        """Get partner info (name, email) for a user"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    SELECT partner_name, partner_email 
+                    FROM partners 
+                    WHERE user_email = ?
+                ''', (user_email,))
+                return cursor.fetchone()
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
+            return None
+            
+    def remove_partner(self, user_email: str) -> bool:
+        """Remove accountability partner for a user"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute('DELETE FROM partners WHERE user_email = ?', (user_email,))
+                return True
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
+            return False db_path
+
+    def create_tables(self):
+        """Create all necessary database tables"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                # Create verification codes table
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS verification_codes (
+                        email TEXT PRIMARY KEY,
+                        code TEXT,
+                        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                ''')
+                
+                # Create users table
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS users (
+                        email TEXT PRIMARY KEY,
+                        username TEXT,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                ''')
+                
+                # Create blocked items table
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS blocked_items (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        email TEXT,
+                        item TEXT,
+                        type TEXT CHECK(type IN ('block', 'white')),
+                        item_type TEXT CHECK(item_type IN ('website', 'app')),
+                        FOREIGN KEY (email) REFERENCES users (email),
+                        UNIQUE(email, item)
+                    )
+                ''')
+
+                # Create partners table
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS partners (
+                        user_email TEXT PRIMARY KEY,
+                        partner_name TEXT NOT NULL,
+                        partner_email TEXT NOT NULL,
+                        added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_email) REFERENCES users (email)
+                    )
+                ''')
+
+                # Add focus mode table
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS focus_modes (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_email TEXT NOT NULL,
+                        title TEXT NOT NULL,
+                        start_time TEXT NOT NULL,
+                        end_time TEXT NOT NULL,
+                        is_daily BOOLEAN NOT NULL,
+                        selected_days TEXT,
+                        allowed_apps TEXT,
+                        allowed_websites TEXT,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_email) REFERENCES users (email)
+                    )
+                ''')
+                
+                conn.commit()
+                return True
+        except sqlite3.Error:
+            return False
+
+    def store_verification_code(self, email: str, code: str) -> bool:
+        """Store a verification code for an email"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute('DELETE FROM verification_codes WHERE email = ?', (email,))
+                cursor.execute('INSERT INTO verification_codes (email, code) VALUES (?, ?)', 
+                             (email, code))
+                conn.commit()
+                return True
+        except sqlite3.Error:
+            return False
+
+    def verify_code(self, email: str, code: str) -> Tuple[bool, Optional[str]]:
+        """Verify a code for an email. Returns (success, error_message)"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    SELECT code, timestamp, 
+                        ROUND((JULIANDAY('now') - JULIANDAY(timestamp)) * 24 * 60) as minutes_diff 
+                    FROM verification_codes 
+                    WHERE email = ?
+                ''', (email,))
+                
+                result = cursor.fetchone()
+                
+                if not result:
+                    return False, "No verification code found"
+                    
+                stored_code, timestamp, minutes_diff = result
+                
+                # Check if code is expired (older than 5 minutes)
+                if minutes_diff > 5:
+                    cursor.execute('DELETE FROM verification_codes WHERE email = ?', (email,))
+                    conn.commit()
+                    return False, "Verification code has expired"
+                    
+                # Verify the code
+                if code == stored_code:
+                    cursor.execute('DELETE FROM verification_codes WHERE email = ?', (email,))
+                    conn.commit()
+                    return True, None
+                else:
+                    return False, "Incorrect verification code"
+                    
+        except sqlite3.Error as e:
+            return False, f"Database error: {str(e)}"
+
+    def add_user(self, email: str, username: str) -> Tuple[bool, Optional[str]]:
+        """Add a verified user to the database"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                # Check if user already exists
+                cursor.execute('SELECT email FROM users WHERE email = ?', (email,))
+                if cursor.fetchone():
+                    # Update username if user exists
+                    cursor.execute('UPDATE users SET username = ? WHERE email = ?', (username, email))
+                else:
+                    # Add new user
+                    cursor.execute('INSERT INTO users (email, username) VALUES (?, ?)', (email, username))
+                conn.commit()
+                return True, None
+        except sqlite3.Error as e:
+            return False, str(e)
+            
+    def get_user_info(self, email: str) -> Tuple[Optional[str], Optional[str]]:
+        """Get user info (email, username) from database"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute('SELECT email, username FROM users WHERE email = ?', (email,))
+                result = cursor.fetchone()
+                return result if result else (None, None)
+        except sqlite3.Error:
+            return None, None
+
+    def add_item(self, email: str, item: str, list_type: str, item_type: str) -> tuple[bool, str]:
+        """Add an item (website or app) to block or white list"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                # Convert item to lowercase for case-insensitive comparison
+                item_lower = item.lower()
+                
+                # Check if item exists in any list (case-insensitive)
+                opposite_type = 'white' if list_type == 'block' else 'block'
+                cursor.execute('SELECT type, item FROM blocked_items WHERE email = ? AND LOWER(item) = ?', 
+                             (email, item_lower))
+                result = cursor.fetchone()
+                if result:
+                    existing_type, existing_item = result
+                    if existing_type == opposite_type:
+                        return False, f"This {item_type} is already in your {existing_type}list"
+                    return False, f"This {item_type} is already in your {list_type}list as '{existing_item}'"
+                
+                # Add the item
+                cursor.execute('''
+                    INSERT INTO blocked_items (email, item, type, item_type) 
+                    VALUES (?, ?, ?, ?)
+                ''', (email, item, list_type, item_type))
+                conn.commit()
+                return True, ""
+        except sqlite3.Error as e:
+            return False, f"Database error: {str(e)}"
+
+    def get_items(self, email: str, list_type: str = None, item_type: str = None) -> list:
+        """Get all items for a user, optionally filtered by type"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                query = 'SELECT item FROM blocked_items WHERE email = ?'
+                params = [email]
+                
+                if list_type:
+                    query += ' AND type = ?'
+                    params.append(list_type)
+                if item_type:
+                    query += ' AND item_type = ?'
+                    params.append(item_type)
+                    
+                cursor.execute(query, params)
+                return [row[0] for row in cursor.fetchall()]
+        except sqlite3.Error:
+            return []
+
+    def remove_item(self, email: str, item: str) -> bool:
+        """Remove an item from any list"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute('DELETE FROM blocked_items WHERE email = ? AND item = ?',
+                             (email, item))
+                conn.commit()
+                return True
+        except sqlite3.Error:
+            return False

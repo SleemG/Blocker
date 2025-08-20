@@ -1,0 +1,105 @@
+/* Main Dialog */
+QDialog {
+    background-color: #f5f5f5;
+    border-radius: 10px;
+}
+
+/* Tab Widget */
+QTabWidget::pane {
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    background-color: white;
+}
+
+QTabWidget::tab-bar {
+    left: 50%;
+}
+
+QTabBar::tab {
+    background-color: #e0e0e0;
+    color: #333333;
+    min-width: 100px;
+    padding: 8px 16px;
+    border: 1px solid #cccccc;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    margin-right: 2px;
+}
+
+QTabBar::tab:selected {
+    background-color: white;
+    border-bottom-color: white;
+}
+
+QTabBar::tab:hover {
+    background-color: #f0f0f0;
+}
+
+/* Labels */
+QLabel {
+    color: #333333;
+}
+
+QLabel#welcomeLabel {
+    color: #2c3e50;
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+QLabel#instructionLabel, QLabel#verifyLabel {
+    color: #7f8c8d;
+    margin-bottom: 15px;
+}
+
+/* Line Edits */
+QLineEdit {
+    padding: 10px;
+    border: 2px solid #bdc3c7;
+    border-radius: 5px;
+    background-color: white;
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+QLineEdit:focus {
+    border-color: #3498db;
+}
+
+QLineEdit#codeInput {
+    font-size: 18px;
+    letter-spacing: 5px;
+}
+
+/* Buttons */
+QPushButton {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    background-color: #2980b9;
+}
+
+QPushButton:pressed {
+    background-color: #2472a4;
+}
+
+QPushButton#resendButton {
+    background-color: transparent;
+    color: #3498db;
+    border: 1px solid #3498db;
+}
+
+QPushButton#resendButton:hover {
+    background-color: #f5f5f5;
+}
+
+QPushButton:disabled {
+    background-color: #bdc3c7;
+    color: #95a5a6;
+}
