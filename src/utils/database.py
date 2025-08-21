@@ -10,6 +10,18 @@ class Database:
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
+
+                # Create settings table
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS user_settings (
+                        user_email TEXT NOT NULL,
+                        setting_name TEXT NOT NULL,
+                        setting_value BOOLEAN NOT NULL,
+                        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_email) REFERENCES users (email),
+                        PRIMARY KEY (user_email, setting_name)
+                    )
+                ''')
                 
                 # Create verification codes table
                 cursor.execute('''
@@ -232,6 +244,50 @@ class Database:
         except sqlite3.Error as e:
             print(f"Database error: {e}")
             return []
+
+    def update_setting(self, user_email: str, setting_name: str, value: bool) -> bool:
+        """Update a user setting in the database"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    INSERT OR REPLACE INTO user_settings (user_email, setting_name, setting_value)
+                    VALUES (?, ?, ?)
+                ''', (user_email, setting_name, value))
+                conn.commit()
+                return True
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
+            return False
+
+    def get_setting(self, user_email: str, setting_name: str) -> Optional[bool]:
+        """Get a user setting from the database"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    SELECT setting_value FROM user_settings
+                    WHERE user_email = ? AND setting_name = ?
+                ''', (user_email, setting_name))
+                result = cursor.fetchone()
+                return bool(result[0]) if result else None
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
+            return None
+
+    def get_all_settings(self, user_email: str) -> dict:
+        """Get all settings for a user"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    SELECT setting_name, setting_value FROM user_settings
+                    WHERE user_email = ?
+                ''', (user_email,))
+                return {row[0]: bool(row[1]) for row in cursor.fetchall()}
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
+            return {}
 
     def is_app_in_any_list(self, email: str, app_path: str) -> bool:
         """Check if an app is in any list (blocked or whitelisted)"""

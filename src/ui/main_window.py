@@ -80,16 +80,25 @@ class MainWindow(QMainWindow):
         # Setup settings tab
         self.setup_settings_connections()
 
+        # Define settings and their default states
+        self.settings_toggles = {
+            'checkBox': {'label': 'Block Adult Content', 'default': True},
+            'checkBox_2': {'label': 'Filter Search Results', 'default': True},
+            'checkBox_3': {'label': 'Block Image/Video Search', 'default': False},
+            'checkBox_4': {'label': 'Block YouTube Shorts', 'default': False},
+            'checkBox_5': {'label': 'Block Telegram Search', 'default': False},
+            'checkBox_6': {'label': 'Uninstall Protection', 'default': True},
+            'checkBox_7': {'label': 'Block Unsupported Browsers', 'default': True},
+            'checkBox_11': {'label': 'Block New Installed Apps', 'default': False}
+        }
 
-        # Convert checkboxes to toggle switches
-        self.convert_checkbox_to_toggle('checkBox', 'Block Adult Content')
-        self.convert_checkbox_to_toggle('checkBox_2', 'Filter Search Results')
-        self.convert_checkbox_to_toggle('checkBox_3', 'Block Image/Video Search')
-        self.convert_checkbox_to_toggle('checkBox_4', 'Block YouTube Shorts')
-        self.convert_checkbox_to_toggle('checkBox_5', 'Block Telegram Search')
-        self.convert_checkbox_to_toggle('checkBox_6', 'Uninstall Protection')
-        self.convert_checkbox_to_toggle('checkBox_7', 'Block Unsupported Browsers')
-        self.convert_checkbox_to_toggle('checkBox_11', 'Block New Installed Apps')
+        # Convert checkboxes to toggle switches and connect signals
+        for checkbox_name, settings in self.settings_toggles.items():
+            toggle = self.convert_checkbox_to_toggle(checkbox_name, settings['label'])
+            if toggle:
+                # Connect the signal to a handler that knows which setting was changed
+                toggle.toggled.connect(lambda checked, name=checkbox_name: 
+                    self.on_setting_changed(name, checked))
 
         # Add floating button
         self.floating_btn = FloatingButton(self, "notification")
@@ -115,6 +124,7 @@ class MainWindow(QMainWindow):
         self.user_email = email
         self.load_user_data()
         self.update_user_info()
+        self.load_user_settings()  # Load saved settings
         
         # Cleanup dialog
         if hasattr(self, 'signup_dialog'):
@@ -460,6 +470,25 @@ class MainWindow(QMainWindow):
                         continue
         return sorted(set(apps))  # Remove duplicates and sort
         
+    def load_user_settings(self):
+        """Load user's saved settings and update toggle switches"""
+        if not self.user_email:
+            return
+
+        # For each setting, load its value and update the toggle
+        for checkbox_name, settings in self.settings_toggles.items():
+            # Get saved value or use default
+            saved_value = self.db.get_setting(self.user_email, checkbox_name)
+            value = saved_value if saved_value is not None else settings['default']
+            
+            # Update the toggle switch
+            toggle = getattr(self, f"{checkbox_name}_toggle", None)
+            if toggle:
+                # Temporarily disconnect the signal to prevent triggering the change handler
+                toggle.blockSignals(True)
+                toggle.setChecked(value)
+                toggle.blockSignals(False)
+
     def show_app_selection_dialog(self, list_widget):
         """Show dialog to select applications to block/whitelist"""
         from .app_selector import ProgramSelectorDialog, ProgramListItem
@@ -638,6 +667,36 @@ class MainWindow(QMainWindow):
                     if email_label:
                         email_label.setText(f"Email: {partner_email}")
                         
+    def on_setting_changed(self, setting_name, checked):
+        """Handle changes to toggle switches in settings"""
+        # Update the setting in the database
+        success = self.db.update_setting(self.user_email, setting_name, checked)
+        
+        if success:
+            # Show a status message
+            setting_label = self.settings_toggles[setting_name]['label']
+            self.show_status_message(
+                f"{setting_label} {'enabled' if checked else 'disabled'}")
+            
+            # If this is a critical setting that requires partner approval
+            critical_settings = ['checkBox_6']  # Uninstall Protection
+            if setting_name in critical_settings:
+                # Show setting change request dialog
+                from .partner_dialog import SettingsChangeDialog
+                dialog = SettingsChangeDialog(
+                    self, 
+                    setting_type='checkbox',
+                    checkbox_name=setting_name,
+                    checkbox_state=checked
+                )
+                dialog.exec_()
+        else:
+            # Revert the toggle if the update failed
+            toggle = getattr(self, f"{setting_name}_toggle", None)
+            if toggle:
+                toggle.setChecked(not checked)
+            self.show_status_message("Failed to update setting", 2000)
+
     def on_partner_added(self):
         """Called when a partner is successfully added"""
         self.update_partner_info()

@@ -169,7 +169,7 @@ class ProgramSelectorDialog(QDialog):
         
         # Title
         title_label = QLabel("Select programs to add:")
-        title_label.setFont(QFont("Segoe UI", 10))
+        title_label.setFont(QFont("Arial", 10))
         layout.addWidget(title_label)
         
         # Search box
@@ -239,13 +239,13 @@ class ProgramSelectorDialog(QDialog):
                 # Extract icon path from registry value
                 icon_path = program['icon_path'].split(',')[0].strip('"')
                 if os.path.exists(icon_path):
-                    icon = IconExtractor.get_file_icon(icon_path, 24)
+                    icon = IconExtractor.get_file_icon(icon_path, 29)
             
             # Icon label
             icon_label = QLabel()
-            icon_label.setFixedSize(24, 24)
+            icon_label.setFixedSize(29, 29)
             if icon:
-                icon_label.setPixmap(icon.pixmap(24, 24))
+                icon_label.setPixmap(icon.pixmap(29, 29))
             else:
                 icon_label.setStyleSheet("""
                     background-color: #404040;
@@ -293,27 +293,36 @@ class ProgramListItem(QWidget):
     def __init__(self, program_data):
         super().__init__()
         
+        # Enable mouse tracking for hover effects
+        self.setMouseTracking(True)
+        
+        # Main layout
         layout = QHBoxLayout()
-        layout.setContentsMargins(8, 4, 8, 4)
+        layout.setContentsMargins(8, 8, 8, 8)  # Increased vertical margins
+        layout.setSpacing(10)  # Add space between elements
+        
+        # Container for checkbox and icon
+        left_container = QHBoxLayout()
+        left_container.setSpacing(5)  # Space between checkbox and icon
         
         # Checkbox for selection
         self.checkbox = QCheckBox()
-        self.checkbox.setFixedSize(16, 16)
-        layout.addWidget(self.checkbox)
+        self.checkbox.setFixedSize(20, 20)
+        left_container.addWidget(self.checkbox)
         
         # Program icon
         icon_label = QLabel()
-        icon_label.setFixedSize(24, 24)
+        icon_label.setFixedSize(29, 29)
         
         # Try to get icon
         icon = None
         if program_data.get('icon_path'):
             icon_path = program_data['icon_path'].split(',')[0].strip('"')
             if os.path.exists(icon_path):
-                icon = IconExtractor.get_file_icon(icon_path, 24)
+                icon = IconExtractor.get_file_icon(icon_path, 29)
         
         if icon:
-            icon_label.setPixmap(icon.pixmap(24, 24))
+            icon_label.setPixmap(icon.pixmap(29, 29))
         else:
             # Default icon placeholder
             icon_label.setStyleSheet("""
@@ -322,31 +331,70 @@ class ProgramListItem(QWidget):
                 border-radius: 3px;
             """)
         
-        layout.addWidget(icon_label)
+        left_container.addWidget(icon_label)
+        layout.addLayout(left_container)
         
         # Program name
         name_label = QLabel(program_data['name'])
-        name_label.setFont(QFont("Segoe UI", 9))
-        name_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        name_label.setFont(QFont("Arial", 9))
+        name_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
         layout.addWidget(name_label)
+        
+        # Info container for size and date
+        info_container = QHBoxLayout()
+        info_container.setSpacing(15)  # Space between size and date
         
         # Size
         size = program_data.get('size', '')
         if size:
             size_label = QLabel(size)
-            size_label.setFont(QFont("Segoe UI", 9))
+            size_label.setFont(QFont("Arial", 9))
             size_label.setMinimumWidth(80)
             size_label.setAlignment(Qt.AlignRight)
-            layout.addWidget(size_label)
+            info_container.addWidget(size_label)
         
         # Install date
         install_date = program_data.get('install_date', '')
         if install_date:
             date_label = QLabel(install_date)
-            date_label.setFont(QFont("Segoe UI", 9))
+            date_label.setFont(QFont("Arial", 9))
             date_label.setMinimumWidth(80)
             date_label.setAlignment(Qt.AlignRight)
-            layout.addWidget(date_label)
+            info_container.addWidget(date_label)
         
+        layout.addLayout(info_container)
+        
+        # Set the layout
         self.setLayout(layout)
         self.program_data = program_data
+        
+        # Set minimum height for the item
+        self.setMinimumHeight(50)
+        
+        # Set object name for stylesheet
+        self.setObjectName("programListItem")
+        
+        # Style the widget
+        self.setStyleSheet("""
+            QWidget#programListItem {
+                border-radius: 4px;
+            }
+            QWidget#programListItem:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+        """)
+    
+    def sizeHint(self):
+        """Override sizeHint to ensure consistent height"""
+        size = super().sizeHint()
+        size.setHeight(50)  # Fixed height for all items
+        return size
+        
+    def mousePressEvent(self, event):
+        """Handle mouse clicks anywhere on the item"""
+        if event.button() == Qt.LeftButton:
+            # Toggle the checkbox
+            self.checkbox.setChecked(not self.checkbox.isChecked())
+            event.accept()
+        else:
+            super().mousePressEvent(event)
