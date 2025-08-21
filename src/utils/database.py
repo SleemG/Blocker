@@ -11,21 +11,6 @@ class Database:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
                 
-                # Drop existing tables
-                tables = [
-                    'focus_modes',
-                    'blocked_items',
-                    'partners',
-                    'verification_codes',
-                    'users'
-                ]
-                for table in tables:
-                    try:
-                        cursor.execute(f'DROP TABLE IF EXISTS {table}')
-                    except sqlite3.Error:
-                        pass
-                conn.commit()
-                
                 # Create verification codes table
                 cursor.execute('''
                     CREATE TABLE IF NOT EXISTS verification_codes (

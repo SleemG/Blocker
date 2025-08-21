@@ -59,10 +59,23 @@ class ProgramLoader(QThread):
     def __init__(self):
         super().__init__()
         self.all_programs = []  # Store programs list as instance variable
+        self._running = True
+
+    def stop(self):
+        """Stop the thread safely"""
+        self._running = False
+        self.wait()  # Wait for thread to finish
+        
+    def __del__(self):
+        """Clean up thread when object is destroyed"""
+        self._running = False
+        self.wait()
     
     def run(self):
         programs = []
-        
+        if not self._running:
+            return
+            
         # Registry paths for installed programs
         registry_paths = [
             (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"),

@@ -18,53 +18,29 @@ from .ui_components import (FloatingButton, FloatingButtonManager,
                           CustomNotification, FloatingPanel, ToggleSwitch)
 from .partner_dialog import PartnerDialog
 from .app_selector import ProgramLoader, ProgramListItem
-from ..utils.adult_content_blocker import (get_blocker_instance, start_content_blocking, 
-                                         stop_content_blocking, is_content_blocking_active)
 
 
 class MainWindow(QMainWindow):
     def __init__(self, show_on_start=True):
         super().__init__()
+        self._program_loader = None  # Store program loader reference
 
         # Get the absolute path to the GUI folder relative to this script
-        self.gui_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "GUI")
-
-        # Load UI first before doing anything else
-        loadUi(os.path.join(self.gui_dir, "App GUI.ui"), self)
-
-        # Initialize variables after UI is loaded
-        self.db = Database()
-        self.user_email = None
-        self.show_on_start = show_on_start
-        self.program_loader = None
+        gui_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "GUI")
         
-        # Create database tables
-        self.db.create_tables()
-        
-        # Initialize focus mode manager
-        self.focus_mode_manager = None  # Will be initialized after user login
-        
-    def __del__(self):
-        """Clean up resources"""
-        if hasattr(self, 'program_loader') and self.program_loader is not None:
-            self.program_loader.quit()
-            self.program_loader.wait()
-            self.program_loader.deleteLater()
-        
-        loadUi(os.path.join(self.gui_dir, "App GUI.ui"), self)
+        loadUi(os.path.join(gui_dir, "App GUI.ui"), self)
         
         # Load modern stylesheet
-        with open(os.path.join(self.gui_dir, "modern_style.qss"), "r") as f:
+        with open(os.path.join(gui_dir, "modern_style.qss"), "r") as f:
             self.setStyleSheet(f.read())
             
         # Load settings stylesheet
-        with open(os.path.join(self.gui_dir, "settings.qss"), "r") as f:
+        with open(os.path.join(gui_dir, "settings.qss"), "r") as f:
             self.settings_tab.setStyleSheet(f.read())
         # Initialize variables
         self.db = Database()
         self.user_email = None
         self.show_on_start = show_on_start
-        self.program_loader = None  # Initialize program loader variable
         
         # Create database tables
         self.db.create_tables()
@@ -176,6 +152,13 @@ class MainWindow(QMainWindow):
         self.update_account_details()
 
             
+    def closeEvent(self, event):
+        """Handle window close event"""
+        if self._program_loader:
+            self._program_loader.stop()
+            self._program_loader.deleteLater()
+        event.accept()
+        
     def update_user_info(self):
         """Update user information in settings tab"""
         if self.user_email:
@@ -202,18 +185,19 @@ class MainWindow(QMainWindow):
         blocked_apps = self.db.get_items(self.user_email, 'block', 'app')
         whitelisted_apps = self.db.get_items(self.user_email, 'white', 'app')
         
-        # Clean up previous loader if it exists
-        if self.program_loader is not None:
-            self.program_loader.quit()
-            self.program_loader.wait()
-            self.program_loader.deleteLater()
-        
         # Load apps from registry to get program info
+        registry_apps = {}
         self._blocked_apps = blocked_apps
         self._whitelisted_apps = whitelisted_apps
-        self.program_loader = ProgramLoader()
-        self.program_loader.programs_loaded.connect(self._on_programs_loaded)
-        self.program_loader.start()  # Start loading in background
+        
+        # Clean up old program loader if it exists
+        if self._program_loader:
+            self._program_loader.stop()
+            self._program_loader.deleteLater()
+            
+        self._program_loader = ProgramLoader()
+        self._program_loader.programs_loaded.connect(self._on_programs_loaded)
+        self._program_loader.start()  # Start loading in background
         
     def _on_programs_loaded(self, apps):
         """Handle loaded program data"""
@@ -229,36 +213,9 @@ class MainWindow(QMainWindow):
         
     def _populate_app_lists(self, blocked_apps, whitelisted_apps, registry_apps):
         """Populate the app lists with program data"""
-        # Add blocked apps
-        for app_path in blocked_apps:
-            if app_path in registry_apps:
-                item = QListWidgetItem()
-                program_widget = ProgramListItem(registry_apps[app_path])
-                item.setSizeHint(program_widget.sizeHint())
-                self.listWidget_2.addItem(item)
-                self.listWidget_2.setItemWidget(item, program_widget)
-            else:
-                # Fallback for apps not found in registry
-                item = QListWidgetItem(app_path)
-                self.listWidget_2.addItem(item)
-        
-        # Add whitelisted apps
-        for app_path in whitelisted_apps:
-            if app_path in registry_apps:
-                item = QListWidgetItem()
-                program_widget = ProgramListItem(registry_apps[app_path])
-                item.setSizeHint(program_widget.sizeHint())
-                self.listWidget_4.addItem(item)
-                self.listWidget_4.setItemWidget(item, program_widget)
-            else:
-                # Fallback for apps not found in registry
-                item = QListWidgetItem(app_path)
-                self.listWidget_4.addItem(item)
-        
-        for app in apps:
-            app_path = app['icon_path'].split(',')[0].strip('"') if app['icon_path'] else app['install_location']
-            if app_path:
-                registry_apps[app_path] = app
+        # Clear existing items
+        self.listWidget_2.clear()
+        self.listWidget_4.clear()
         
         # Add blocked apps
         for app_path in blocked_apps:
@@ -285,7 +242,9 @@ class MainWindow(QMainWindow):
                 # Fallback for apps not found in registry
                 item = QListWidgetItem(app_path)
                 self.listWidget_4.addItem(item)
-                
+                self.listWidget_4.addItem(item)
+                self.listWidget_4.setItemWidget(item, program_widget)
+
 
     def update_account_details(self):
         """Update the account details page with user information"""
@@ -342,11 +301,11 @@ class MainWindow(QMainWindow):
             
         # Load whitelisted websites
         for item in self.db.get_items(self.user_email, 'white', 'website'):
-            self.listWidget_4.addItem(item)
+            self.listWidget_3.addItem(item)  # Website whitelist goes to listWidget_3
             
         # Load whitelisted apps
         for item in self.db.get_items(self.user_email, 'white', 'app'):
-            self.listWidget_3.addItem(item)  # Add to listWidget_3 for whitelist
+            self.listWidget_4.addItem(item)  # App whitelist goes to listWidget_4
 
         # Initialize focus mode manager after user data is loaded
         if not self.focus_mode_manager:
@@ -393,10 +352,7 @@ class MainWindow(QMainWindow):
             list_type = 'block' if list_widget in [self.listWidget, self.listWidget_2] else 'white'
             success, message = self.db.add_item(self.user_email, text, list_type, 'website')
             if success:
-                if list_type == 'white':
-                    self.listWidget_3.addItem(text)  # Always add to listWidget_3 for whitelist
-                else:
-                    list_widget.addItem(text)
+                list_widget.addItem(text)  # Add to the correct list widget
                 line_edit.clear()
                 self.show_status_message(f"Added website/keyword to {list_type}list: {text}")
             else:
@@ -441,8 +397,8 @@ class MainWindow(QMainWindow):
                 item_text = item.text()
                 item_type = 'website'
             
-            # Remove from database first
-            if self.db.remove_item(self.user_email, item_text, list_type, item_type):
+            # Remove from database first - only need email and item
+            if self.db.remove_item(self.user_email, item_text):
                 list_widget.takeItem(i)
                 success_count += 1
                 
@@ -462,23 +418,7 @@ class MainWindow(QMainWindow):
         for list_widget in list_widgets:
             list_widget.setAlternatingRowColors(True)
             list_widget.setSelectionMode(QListWidget.NoSelection)  # Selection is handled by checkboxes
-            list_widget.setStyleSheet("""
-                QListWidget {
-                    background-color: #353535;
-                    border: 1px solid #555555;
-                    alternate-background-color: #3a3a3a;
-                    selection-background-color: transparent;
-                    outline: none;
-                }
-                QListWidget::item {
-                    padding: 0px;
-                    border-bottom: 1px solid #444444;
-                    min-height: 32px;
-                }
-                QListWidget::item:hover {
-                    background-color: #404040;
-                }
-            """)
+            
             
     def get_installed_apps(self):
         """Get list of installed applications"""
