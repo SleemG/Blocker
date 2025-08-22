@@ -1,0 +1,68 @@
+/* Main Dialog Style */
+
+QDialog {
+    background: #221b1b;  /* Dark blue-grey background */
+    
+}
+
+
+/* Label Styles */
+QLabel {
+    color: #ECF0F1;  /* Light grey text */
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px;
+}
+
+#title_lbl{
+    font-size: 60px;
+    color: #a10000;  /* Light grey text */
+    background-color: rgb(196, 174, 174);
+    border-bottom-left-radius: 25px;
+    border-top-left-radius: 0;
+    border-bottom-right-radius: 25px;
+    border-top-right-radius: 0;
+    width: 100%;
+}
+#blkRsn_lbl {
+    background-color: #5e3434;  /* Slightly lighter blue-grey */
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px;
+    font-size: 18px;
+}
+
+/* Button Style */
+QPushButton {
+    background-color: #db3434;  /*  */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 17px;
+    font-weight: bold;
+    min-width: 100px;
+}
+
+QPushButton:hover {
+    background-color: #b92929;  /* Darker blue on hover */
+}
+
+QPushButton:pressed {
+    background-color: #a42424;  /* Even darker blue when pressed */
+    padding-left: 22px;  /* Shift content slightly when pressed */
+    padding-top: 12px;
+}
+
+
+/* TextBrowser Style */
+QTextBrowser {
+    background-color: transparent;  /* Remove background */
+    border: 1px solid #dfbdbd;  /* Add a light border */
+    color: #ECF0F1;               /* Light grey text to match other labels */
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 20px;
+
+}
