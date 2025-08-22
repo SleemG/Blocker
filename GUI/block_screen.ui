@@ -91,7 +91,7 @@ p, li { white-space: pre-wrap; }
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
       </font>
      </property>
      <property name="cursor">
