@@ -19,6 +19,8 @@ from .ui_components import (FloatingButton, FloatingButtonManager,
 from .partner_dialog import PartnerDialog
 from .app_selector import ProgramLoader, ProgramListItem
 
+from ..core.blocker_integration import integrate_blocker_with_main_window
+
 
 class MainWindow(QMainWindow):
     def __init__(self, show_on_start=True):
@@ -125,7 +127,8 @@ class MainWindow(QMainWindow):
         self.load_user_data()
         self.update_user_info()
         self.load_user_settings()  # Load saved settings
-        
+        integrate_blocker_with_main_window(self)
+
         # Cleanup dialog
         if hasattr(self, 'signup_dialog'):
             self.signup_dialog.deleteLater()

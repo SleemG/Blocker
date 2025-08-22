@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1111</width>
-    <height>758</height>
+    <width>890</width>
+    <height>658</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -166,7 +166,7 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>51</width>
+       <width>41</width>
        <height>20</height>
       </size>
      </property>
@@ -179,7 +179,7 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>50</width>
+       <width>40</width>
        <height>20</height>
       </size>
      </property>
@@ -231,7 +231,7 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>51</width>
+       <width>41</width>
        <height>20</height>
       </size>
      </property>
@@ -244,7 +244,7 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>51</width>
+       <width>40</width>
        <height>20</height>
       </size>
      </property>
@@ -270,7 +270,7 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>50</width>
+       <width>40</width>
        <height>20</height>
       </size>
      </property>
@@ -283,7 +283,7 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>51</width>
+       <width>41</width>
        <height>20</height>
       </size>
      </property>
@@ -296,7 +296,7 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>51</width>
+       <width>41</width>
        <height>20</height>
       </size>
      </property>
@@ -309,7 +309,7 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>51</width>
+       <width>41</width>
        <height>20</height>
       </size>
      </property>
@@ -322,7 +322,7 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>51</width>
+       <width>41</width>
        <height>20</height>
       </size>
      </property>
@@ -361,7 +361,7 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>51</width>
+       <width>41</width>
        <height>20</height>
       </size>
      </property>
@@ -387,7 +387,7 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>51</width>
+       <width>41</width>
        <height>20</height>
       </size>
      </property>

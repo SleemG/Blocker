@@ -11,15 +11,28 @@ class Database:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
 
-                # Create settings table
+                # Create settings table with support for all value types
                 cursor.execute('''
                     CREATE TABLE IF NOT EXISTS user_settings (
                         user_email TEXT NOT NULL,
                         setting_name TEXT NOT NULL,
-                        setting_value BOOLEAN NOT NULL,
+                        setting_value TEXT NOT NULL,
+                        setting_type TEXT CHECK(setting_type IN ('boolean', 'text', 'number')),
                         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                         FOREIGN KEY (user_email) REFERENCES users (email),
                         PRIMARY KEY (user_email, setting_name)
+                    )
+                ''')
+                
+                # Create blocked keywords table
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS blocked_keywords (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_email TEXT NOT NULL,
+                        keyword TEXT NOT NULL,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_email) REFERENCES users (email),
+                        UNIQUE(user_email, keyword)
                     )
                 ''')
                 
