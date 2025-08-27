@@ -1,0 +1,154 @@
+/* Main Window */
+QMainWindow#SignUpWindow {
+    background-color: #fff;
+}
+
+/* Left Widget */
+QWidget#left_wdgt {
+    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgba(83, 176, 230, 255), stop:1 rgba(19, 102, 202, 255));
+}
+
+/* Right Widget - Content Area */
+QWidget#right_wdgt {
+    background-color: #fff;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    color: #2ecc71;
+}
+
+/* Stack Widget */
+QStackedWidget {
+    background-color: transparent;
+}
+
+/* Sign Up Page */
+#signup_pg {
+    background-color: transparent;
+}
+
+/* Verify Page */
+#verify_pg {
+    background-color: white;
+    border-radius: 10px;
+}
+
+/* Line Edits - Email, Name, Password */
+QLineEdit {
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 20px;
+    color: #2c3e50;
+    margin: 5px 0;
+}
+
+QLineEdit:focus {
+    border-color: #4793c5;
+}
+QLineEdit:hover {
+    border-color: #0099ff;
+}
+
+/* Verification Code Input */
+#lineEdit, #lineEdit_2, #lineEdit_3, #lineEdit_4, #lineEdit_5, #lineEdit_6 {
+    font-size: 24px;
+    width: 45px;
+    height: 45px;
+    border: 2px solid #3498db;
+    border-radius: 8px;
+    background-color: white;
+    text-align: center;
+}
+
+/* Sign Up Button */
+#signUp_btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 15px 30px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+#signUp_btn:hover {
+    background-color: #2980b9;
+}
+
+#signUp_btn:pressed {
+    background-color: #2472a4;
+}
+
+/* Verify Button */
+#verify_btn {
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#verify_btn:hover {
+    background-color: #27ae60;
+}
+
+#verify_btn:pressed {
+    background-color: #219a52;
+}
+
+/* Resend Button */
+#resend_btn {
+    background-color: transparent;
+    color: #3498db;
+    border: 1px solid #3498db;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 14px;
+}
+
+#resend_btn:hover {
+    background-color: #f5f5f5;
+    color: #2980b9;
+}
+
+#resend_btn:disabled {
+    background-color: #f5f5f5;
+    color: #bdc3c7;
+    border-color: #bdc3c7;
+}
+
+#welcom_lbl{
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+#appName_lbl{
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+#msg_lbl{
+    color: #ffffff;
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+#signUp_lbl{
+    color: #056475;
+    font-size: 40px;
+    font-weight: bold;
+    margin-bottom: 40px;
+    letter-spacing: 3px;
+}
+
+/* Timer Label */
+#timer_lbl {
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+

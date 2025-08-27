@@ -1,0 +1,185 @@
+/* ===== App GUI Main Stylesheet ===== */
+
+/* General app background and font */
+* {
+    font-family: "Arial", sans-serif;
+    font-size: 14px;
+    color: #222;
+}
+
+/* Main window background */
+QMainWindow {
+    background-color: #f7f9fb;
+}
+
+/* Titles */
+#blkListTitle_lbl, #whtListTilte_lbl {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1976d2;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+/* Stacked widget background */
+#stackedWidget_blkLst {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+/* Navigation Buttons */
+#whiteList_btn, #blockList_btn {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 14px 28px;
+    margin-right: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    /* transition: background 0.2s, border 0.2s; */
+}
+
+#whiteList_btn:hover, #blockList_btn:hover {
+    background-color: #e3f2fd;
+    border-color: #90caf9;
+}
+
+#whiteList_btn:focus, #blockList_btn:focus,
+#blockList_btn:checked, #whiteList_btn:checked {
+    background-color: #fff;
+    border: 2px solid #1976d2;
+    color: #1976d2;
+    outline: none;
+}
+
+/* Tab Widget Styling */
+QTabWidget::pane {
+    border: 2px solid #1976d2;
+    border-radius: 8px;
+    top: -1px;
+    background: #fff;
+}
+
+QTabBar::tab {
+    background: #e0e0e0;
+    color: #222;
+    border: 1px solid #aaa;
+    border-bottom: none;
+    padding: 8px 24px;
+    min-width: 150px;
+    font-weight: bold;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    margin-right: 2px;
+    /* transition: background 0.2s, color 0.2s; */
+}
+
+QTabBar::tab:selected {
+    background: #a0c4ff;
+    color: #1976d2;
+    border: 2px solid #1976d2;
+    border-bottom: none;
+}
+
+QTabBar::tab:hover {
+    background: #b9fbc0;
+    color: #222;
+}
+
+/* Example: Style a specific tab widget page */
+#web_tab_bl {
+    background-color: #f0f0f0;
+    border-radius: 6px;
+    padding: 12px;
+}
+
+/* QPushButton General Style */
+QPushButton {
+    background: #c8e6c9;
+    border: 1px solid #388e3c;
+    border-radius: 6px;
+    padding: 8px 18px;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+QPushButton:hover {
+    background: #a5d6a7;
+    border-color: #1976d2;
+}
+
+QPushButton:pressed {
+    background: #81c784;
+    border-color: #388e3c;
+}
+
+/* QLabel General Style */
+QLabel {
+    font-size: 15px;
+    color: #333;
+}
+
+/* QLineEdit Style */
+QLineEdit {
+    border: 2px solid #1976d2;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 15px;
+    background: #f7f9fb;
+    color: #222;
+}
+
+QLineEdit:focus {
+    border: 2px solid #388e3c;
+    background: #fff;
+}
+
+/* QListWidget and QListView Style */
+QListWidget, QListView {
+    border: 1.5px solid #90caf9;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 15px;
+    color: #222;
+    padding: 6px;
+}
+
+QListWidget::item:selected, QListView::item:selected {
+    background: #a0c4ff;
+    color: #1976d2;
+    border-radius: 4px;
+}
+
+/* QStatusBar Style */
+QStatusBar {
+    background: #e3f2fd;
+    color: #1976d2;
+    border-top: 1px solid #90caf9;
+    font-size: 13px;
+}
+
+/* ScrollBar Styling (optional, for a modern look) */
+QScrollBar:vertical {
+    border: none;
+    background: #f0f0f0;
+    width: 10px;
+    margin: 0px 0px 0px 0px;
+    border-radius: 5px;
+}
+QScrollBar::handle:vertical {
+    background: #90caf9;
+    min-height: 20px;
+    border-radius: 5px;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0;
+    background: none;
+    border: none;
+}
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+/* ===== End of App GUI.qss ===== */

@@ -1,0 +1,3 @@
+2025-08-23 19:57:16.987 adult_content_blocker.py[390] <lambda> -> Find Control Timeout(10s): {AutomationId: 'addressEditBox', ControlType: EditControl}
+2025-08-23 19:57:27.602 adult_content_blocker.py[391] <lambda> -> Find Control Timeout(10s): {AutomationId: 'addressEditBox', ControlType: ComboBoxControl}
+2025-08-23 19:57:39.145 adult_content_blocker.py[409] <lambda> -> 
