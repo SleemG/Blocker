@@ -32,16 +32,18 @@ class BlockScreen(QtWidgets.QDialog):
         cls.last_shown_time = time.time()
     
     def __init__(self, user_email=None):
-        if not BlockScreen.can_show_screen():
-            remaining_wait = BlockScreen.DELAY_SECONDS - (time.time() - BlockScreen.last_shown_time)
-            print(f"Please wait {remaining_wait:.1f} seconds before showing block screen again")
-            return None
-            
         super().__init__()
+        # Initialize essential attributes first
         self.user_email = user_email
         self.db = Database()
         self.remaining_time = 0
         self.prevent_close = True
+        
+        if not BlockScreen.can_show_screen():
+            remaining_wait = BlockScreen.DELAY_SECONDS - (time.time() - BlockScreen.last_shown_time)
+            print(f"Please wait {remaining_wait:.1f} seconds before showing block screen again")
+            self.close()
+            return
         BlockScreen.update_last_shown()  # Update last shown time
 
         # Set up focus check timer
