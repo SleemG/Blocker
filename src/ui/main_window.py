@@ -32,13 +32,23 @@ class MainWindow(QMainWindow):
         
         loadUi(os.path.join(gui_dir, "App GUI.ui"), self)
         
-        # Load modern stylesheet
+        # Load and combine all stylesheets with proper priority
+        stylesheets = []
+        
+        # First load the base styles
         with open(os.path.join(gui_dir, "modern_style.qss"), "r") as f:
-            self.setStyleSheet(f.read())
-            
-        # Load settings stylesheet
+            stylesheets.append(f.read())
+        
+        # Then load settings styles
         with open(os.path.join(gui_dir, "settings.qss"), "r") as f:
-            self.settings_tab.setStyleSheet(f.read())
+            stylesheets.append(f.read())
+            
+        # Finally load SignUp styles to take precedence
+        with open(os.path.join(gui_dir, "SignUp.qss"), "r") as f:
+            stylesheets.append(f.read())
+            
+        # Combine all stylesheets and apply them
+        self.setStyleSheet("\n".join(stylesheets))
         # Initialize variables
         self.db = Database()
         self.user_email = None

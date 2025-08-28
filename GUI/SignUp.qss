@@ -16,10 +16,6 @@ QWidget#right_wdgt {
     color: #2ecc71;
 }
 
-/* Stack Widget */
-QStackedWidget {
-    background-color: transparent;
-}
 
 /* Sign Up Page */
 #signup_pg {
@@ -33,7 +29,7 @@ QStackedWidget {
 }
 
 /* Line Edits - Email, Name, Password */
-QLineEdit {
+#name_lineEdit, #email_lineEdit, #pass_lineEdit {
     padding: 12px;
     border: 2px solid #e0e0e0;
     border-radius: 6px;
