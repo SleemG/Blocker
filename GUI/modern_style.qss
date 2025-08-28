@@ -151,11 +151,13 @@ QMessageBox QPushButton {
 /* Code input cells */
 QLineEdit[codeInput="true"] {
     font-size: 20px;
-    font-weight: bold;
     text-align: center;
+    font-weight: bold;
     min-width: 40px;
     min-height: 40px;
 }
+
+
 
 #QPushButton#pushButton_3 {
     position: absolute;

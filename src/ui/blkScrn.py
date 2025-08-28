@@ -32,30 +32,41 @@ class BlockScreen(QtWidgets.QDialog):
         cls.last_shown_time = time.time()
     
     def __init__(self, user_email=None):
-        super().__init__()
+        super().__init__(None)  # Pass None as parent to ensure top-level window
         # Initialize essential attributes first
         self.user_email = user_email
         self.db = Database()
         self.remaining_time = 0
         self.prevent_close = True
+        self.initialized = False  # Track initialization state
         
         if not BlockScreen.can_show_screen():
             remaining_wait = BlockScreen.DELAY_SECONDS - (time.time() - BlockScreen.last_shown_time)
             print(f"Please wait {remaining_wait:.1f} seconds before showing block screen again")
-            self.close()
+            QtCore.QTimer.singleShot(0, self.close)  # Defer close to prevent blank window
             return
+            
+        # Ensure proper window setup
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)  # Clean up on close
+        self.setAttribute(QtCore.Qt.WA_ShowWithoutActivating)  # Prevent automatic activation
+        
+        # Set window flags for proper fullscreen
+        self.setWindowFlags(
+            QtCore.Qt.Window |  # Ensure it's a window
+            QtCore.Qt.FramelessWindowHint |  # No frame
+            QtCore.Qt.WindowStaysOnTopHint |  # Always on top
+            QtCore.Qt.X11BypassWindowManagerHint  # Bypass window manager
+        )
         BlockScreen.update_last_shown()  # Update last shown time
-
-        # Set up focus check timer
-        self.focus_timer = QTimer(self)
-        self.focus_timer.timeout.connect(self.check_focus)
-        self.focus_timer.start(100)  # Check every 100ms
 
         # Get the directory containing the current script
         current_dir = os.path.dirname(os.path.abspath(__file__))
         # Construct the paths to the UI and QSS files
         ui_file = os.path.join(current_dir, r"../../GUI/block_screen.ui")
         qss_file = os.path.join(current_dir, r"../../GUI/block_screen.qss")
+        
+        # Set window to be modal
+        self.setModal(True)
         
         # Load UI
         uic.loadUi(ui_file, self)
@@ -65,24 +76,12 @@ class BlockScreen(QtWidgets.QDialog):
             style = f.read()
             self.setStyleSheet(style)
         
-        # Initialize timer
+        # Initialize timers
         self.countdown_timer = QTimer(self)
         self.countdown_timer.timeout.connect(self.update_countdown)
-            
-        # Set window flags to ensure it stays on top and blocks input
-        self.setWindowFlags(
-            QtCore.Qt.WindowStaysOnTopHint | 
-            QtCore.Qt.FramelessWindowHint |
-            QtCore.Qt.WindowSystemMenuHint |
-            QtCore.Qt.X11BypassWindowManagerHint  # Bypass window manager
-        )
-        self.setWindowState(QtCore.Qt.WindowFullScreen)
         
-        # Set window attributes
-        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)  # Clean up on close
-        
-        # Set modal to block input to other windows
-        self.setModal(True)
+        self.focus_timer = QTimer(self)
+        self.focus_timer.timeout.connect(self.check_focus)
         
         # Set an opaque background
         self.setAutoFillBackground(True)
@@ -90,9 +89,15 @@ class BlockScreen(QtWidgets.QDialog):
         palette.setColor(self.backgroundRole(), QtCore.Qt.black)
         self.setPalette(palette)
         
+        # Make sure the window takes up the full screen
+        desktop = QtWidgets.QApplication.desktop()
+        screen_geometry = desktop.screenGeometry()
+        self.setGeometry(screen_geometry)
+        
         print("Block screen window flags set")
-        self.showFullScreen()
-        print("Block screen shown fullscreen")
+        # Use QTimer to ensure proper window setup before showing
+        QtCore.QTimer.singleShot(0, self._show_fullscreen)
+        print("Block screen fullscreen show scheduled")
 
         # Ensure the window is activated and raised
         self.activateWindow()
@@ -118,7 +123,10 @@ class BlockScreen(QtWidgets.QDialog):
         
         # Load customization values
         self.load_customization()
-
+        
+        # Mark as fully initialized
+        self.initialized = True
+        
     def load_customization(self):
         """Load customization values from database"""
         if self.user_email:
@@ -128,8 +136,18 @@ class BlockScreen(QtWidgets.QDialog):
                 if custom_message and hasattr(self, 'msg_txtBrwsr'):
                     print("Setting custom message:", custom_message)
                     try:
-                        self.msg_txtBrwsr.setHtml(custom_message)
-                        self.msg_txtBrwsr.setAlignment(QtCore.Qt.AlignCenter)
+                        # Convert newlines to <br> tags and preserve formatting
+                        formatted_message = custom_message.replace('\n', '<br>')
+
+                        self.msg_txtBrwsr.setHtml(formatted_message)
+                        # self.msg_txtBrwsr.setAlignment(QtCore.Qt.AlignCenter)
+
+                        # font = self.msg_txtBrwsr.font()
+                        # font.setFamily("Century Gothic")  # Ensure the font is available
+                        # font.setPointSize(16)
+                        # font.setWeight(QtWidgets.QFont.Bold)
+                        # self.msg_txtBrwsr.setFont(font)
+                        
                         print("Message set successfully")
                     except Exception as e:
                         print(f"Error setting message: {e}")
@@ -196,6 +214,15 @@ class BlockScreen(QtWidgets.QDialog):
     def handle_redirect(self):
         """Handle redirect when countdown ends"""
         try:
+            # Stop timers before any other operations
+            if hasattr(self, 'countdown_timer'):
+                self.countdown_timer.stop()
+            if hasattr(self, 'focus_timer'):
+                self.focus_timer.stop()
+                
+            # Hide window before redirect to prevent visual artifacts
+            self.hide()
+            
             if self.user_email:
                 redirect_url = self.db.get_setting(self.user_email, 'redirect_url')
                 if not redirect_url:
@@ -210,12 +237,19 @@ class BlockScreen(QtWidgets.QDialog):
             print(f"Error in redirect: {e}")
             webbrowser.open("https://www.google.com")  # Fallback on error
         finally:
+            # Ensure window is hidden and destroyed
             self.hide()
+            BlockScreen.update_last_shown()  # Update last shown time
             self.close()
             self.deleteLater()  # Ensure proper cleanup
 
     def closeEvent(self, event):
         """Handle window close event"""
+        # If not fully initialized, allow close
+        if not hasattr(self, 'initialized') or not self.initialized:
+            event.accept()
+            return
+            
         # Only allow close if countdown is finished
         if self.remaining_time > 0:
             print("Blocking close attempt - countdown not finished")
@@ -226,6 +260,13 @@ class BlockScreen(QtWidgets.QDialog):
             
         print("Block screen closing...")
         BlockScreen.update_last_shown()  # Update last shown time when closing
+        
+        # Stop all timers
+        if hasattr(self, 'countdown_timer'):
+            self.countdown_timer.stop()
+        if hasattr(self, 'focus_timer'):
+            self.focus_timer.stop()
+            
         self.hide()
         event.accept()
         self.deleteLater()
@@ -241,9 +282,23 @@ class BlockScreen(QtWidgets.QDialog):
             return
         super().keyPressEvent(event)
             
+    def _show_fullscreen(self):
+        """Show the window in proper fullscreen mode"""
+        if not self.initialized:
+            return
+            
+        self.showFullScreen()
+        self.activateWindow()
+        self.raise_()
+        
+        # Start timers after showing
+        self.focus_timer.start(100)  # Check focus every 100ms
+        self.countdown_timer.start(1000)  # Start countdown
+
     def check_focus(self):
         """Ensure block screen stays in focus and on top"""
-        if not self.isActiveWindow() and self.remaining_time > 0:
+        if self.initialized and not self.isActiveWindow() and self.remaining_time > 0:
+            self.showFullScreen()  # Ensure it's still fullscreen
             self.activateWindow()
             self.raise_()
 

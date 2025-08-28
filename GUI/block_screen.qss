@@ -88,13 +88,33 @@ QPushButton:pressed {
 
 
 /* TextBrowser Style */
-QTextBrowser {
-    background-color: transparent;  /* Remove background */
-    border: 1px solid #dfbdbd;  /* Add a light border */
-    color: #ECF0F1;               /* Light grey text to match other labels */
-    font-size: 16px;
-    font-weight: bold;
-    padding: 10px;
-    border-radius: 20px;
+QTextBrowser#msg_txtBrwsr {
+    background-color: rgba(46, 32, 32, 0.95);  
+    border: 2px solid #702c2c;  
+    color: #ECF0F1;  
+    font-size: 20px;
+    line-height: 1.6;
+    padding: 20px;
+    border-radius: 15px;
+    margin: 10px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
+/* Style the scrollbar for the text browser */
+QTextBrowser#msg_txtBrwsr QScrollBar:vertical {
+    border: none;
+    background: #3a2828;
+    width: 10px;
+    margin: 0;
+}
+
+QTextBrowser#msg_txtBrwsr QScrollBar::handle:vertical {
+    background: #702c2c;
+    min-height: 20px;
+    border-radius: 5px;
+}
+
+QTextBrowser#msg_txtBrwsr QScrollBar::add-line:vertical,
+QTextBrowser#msg_txtBrwsr QScrollBar::sub-line:vertical {
+    height: 0;
 }
