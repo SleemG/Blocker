@@ -18,6 +18,8 @@ import win32api
 # Import the proper block screen implementation
 from ..ui.blkScrn import BlockScreen
 
+from .content_filters import ADULT_DOMAINS, ADULT_KEYWORDS, SUSPICIOUS_URL_PATTERNS
+
 class ContentAnalyzer(QObject):
     """Analyzes web content for adult material"""
     
@@ -28,37 +30,10 @@ class ContentAnalyzer(QObject):
         super().__init__()
         print("Initializing ContentAnalyzer")
         
-        # Known adult domains that should be blocked immediately
-        self.adult_domains = [
-            'pornhub.com', 'xvideos.com', 'xnxx.com', 'redtube.com', 
-            'youporn.com', 'xhamster.com', 'tube8.com', 'youjizz.com',
-            'spankbang.com', 'cam4.com', 'chaturbate.com', 'myfreecams.com',
-            'livejasmin.com', 'stripchat.com', 'bongacams.com', 'onlyfans.com',
-            'adultwork.com', 'seeking.com', 'adultfriendfinder.com'
-        ]
-        
-        # Extended list of adult content keywords
-        self.adult_keywords = [
-            'porn', 'sex', 'adult', 'nude', 'naked', 'xxx', 'erotic', 'nsfw',
-            'mature', 'explicit', 'sensual', 'seductive', 'intimate', 'sensuous',
-            'provocative', 'sultry', 'steamy', 'risque', 'racy', 'suggestive',
-            'bikini', 'lingerie', 'underwear', 'bra', 'panties', 'thong',
-            'escort', 'dating', 'hookup', 'casual', 'affair', 'romance',
-            'lesbian', 'gay', 'bisexual', 'transgender', 'fetish', 'kink',
-            'webcam', 'cam girl', 'live show', 'strip', 'tease', 'dance',
-            'massage', 'therapy', 'spa', 'relax', 'pleasure', 'satisfaction',
-            'xvideos', 'pornhub', 'youporn', 'redtube', 'xhamster',
-            # Arabic keywords
-            'جنس', 'اباحي', 'عاري',
-        ]
-        
-        # Adult domains/sites
-        self.adult_domains = [
-            'pornhub.com', 'xvideos.com', 'redtube.com', 'youporn.com',
-            'xhamster.com', 'tube8.com', 'beeg.com', 'spankbang.com',
-            'tnaflix.com', 'drtuber.com', 'porn.com', 'sex.com',
-            'brazzers.com','bangbros.com','xnxx.com',
-        ]
+        # Load filters from configuration
+        self.adult_domains = ADULT_DOMAINS
+        self.adult_keywords = ADULT_KEYWORDS
+        self.suspicious_patterns = SUSPICIOUS_URL_PATTERNS
     
     def analyze_url(self, url: str) -> Dict[str, any]:
         """Analyze URL for adult content"""
@@ -97,13 +72,22 @@ class ContentAnalyzer(QObject):
             detected = []
             
             # Debug print
-            print("Checking for keywords in URL...")
+            print("Checking for suspicious patterns in URL...")
             
+            # Check keyword matches
             for keyword in self.adult_keywords:
                 if keyword in full_url:
                     print(f"Found keyword in URL: {keyword}")
                     detected.append(keyword)
                     result['score'] += 10
+            
+            # Check regex patterns
+            for pattern in self.suspicious_patterns:
+                matches = re.findall(pattern, full_url)
+                if matches:
+                    print(f"Found suspicious pattern in URL: {pattern}")
+                    detected.append(matches[0])  # Add the first match
+                    result['score'] += 15  # Higher score for regex pattern matches
             
             if detected:
                 result['detected_keywords'] = detected

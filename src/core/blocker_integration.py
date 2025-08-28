@@ -129,12 +129,11 @@ class BlockerIntegration(QObject):
                     self.main_window.plainTextEdit.setPlainText(saved_message)
                 else:
                     # Set default message if none saved
-                    default_message = """<div style='text-align: center; font-size: 18px; color: #2c3e50;'>
-<h2 style='color: #e74c3c;'>اتقي الله في نفسك</h2>
-<p><strong>This content has been blocked for your protection.</strong></p>
-<p>Content blocking helps maintain a safe and productive browsing environment.</p>
-<p style='color: #7f8c8d; font-size: 14px;'>BlockerHero - Your Digital Wellness Partner</p>
-</div>"""
+                    default_message = """
+                                        <div style='text-align: center; font-size: 18px; color: #2c3e50;'>
+                                            <h2 style='color: #e74c3c;'>اتقي الله في نفسك</h2>
+                                        </div>
+                                    """
                     self.main_window.plainTextEdit.setPlainText(default_message)
                 
                 # Connect the signal

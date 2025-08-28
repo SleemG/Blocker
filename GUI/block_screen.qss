@@ -92,12 +92,12 @@ QTextBrowser#msg_txtBrwsr {
     background-color: rgba(46, 32, 32, 0.95);  
     border: 2px solid #702c2c;  
     color: #ECF0F1;  
-    font-size: 20px;
     line-height: 1.6;
     padding: 20px;
     border-radius: 15px;
     margin: 10px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 20px;
 }
 
 /* Style the scrollbar for the text browser */

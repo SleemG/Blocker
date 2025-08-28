@@ -28,12 +28,10 @@ class ContentAnalyzer:
                     (self.user_email,)
                 )
                 result = cursor.fetchone()
-                self.block_message = result[0] if result else """<div style='text-align: center; font-size: 18px; color: #2c3e50;'>
-<h2 style='color: #e74c3c;'>اتقي الله في نفسك</h2>
-<p><strong>This content has been blocked for your protection.</strong></p>
-<p>Content blocking helps maintain a safe and productive browsing environment.</p>
-<p style='color: #7f8c8d; font-size: 14px;'>BlockerHero - Your Digital Wellness Partner</p>
-</div>"""
+                self.block_message = result[0] if result else """
+                <div style='text-align: center; font-size: 18px; color: #2c3e50;'>
+                    <h2 style='color: #e74c3c;'>اتقي الله في نفسك</h2>
+                </div>"""
                 
                 # Get countdown duration
                 cursor.execute(
