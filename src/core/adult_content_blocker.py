@@ -323,14 +323,28 @@ class BrowserMonitor(QThread):
             title = window_info['title']
             print(f"\nChecking content for window: {title}")
             
-            # First analyze window title itself for adult content
-            result = self.content_analyzer.analyze_text(title)
-            if result['is_blocked']:
-                print(f"Adult content detected in title: {result['reason']}")
-                if not hasattr(self, 'current_block_screen') or not self.current_block_screen:
-                    self.content_blocked.emit(title, result['reason'], 
-                                           ', '.join(result['detected_keywords']))
-                return
+            # First directly check title against keywords
+            title_lower = title.lower()
+            from .content_filters import ADULT_KEYWORDS, ADULT_DOMAINS
+            
+            # Check for keywords first
+            for keyword in ADULT_KEYWORDS:
+                if keyword.lower() in title_lower:
+                    reason = f"Blocked keyword found in title: {keyword}"
+                    print(f"Adult content detected in title: {reason}")
+                    if not hasattr(self, 'current_block_screen') or not self.current_block_screen:
+                        self.content_blocked.emit(title, reason, keyword)
+                    return
+            
+            # Then check for domain names
+            for domain in ADULT_DOMAINS:
+                domain_name = domain.split('.')[0]  # Get just the domain name without TLD
+                if domain_name.lower() in title_lower:
+                    reason = f"Blocked domain found in title: {domain}"
+                    print(f"Adult content detected in title: {reason}")
+                    if not hasattr(self, 'current_block_screen') or not self.current_block_screen:
+                        self.content_blocked.emit(title, reason, domain)
+                    return
             
             # If no adult content in title, try to get URL
             url = self.extract_url_from_title(title)
