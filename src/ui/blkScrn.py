@@ -60,9 +60,9 @@ class BlockScreen(QtWidgets.QDialog):
 
         # Get the directory containing the current script
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        # Construct the paths to the UI and QSS files
+        # Construct the path to the UI and QSS files
         ui_file = os.path.join(current_dir, r"../../GUI/block_screen.ui")
-        qss_file = os.path.join(current_dir, r"../../GUI/block_screen.qss")
+        qss_file = os.path.join(current_dir, r"../../GUI/main.qss")
         
         # Set window to be modal
         self.setModal(True)
@@ -70,10 +70,9 @@ class BlockScreen(QtWidgets.QDialog):
         # Load UI
         uic.loadUi(ui_file, self)
         
-        # Load and apply stylesheet
+        # Load and apply main stylesheet
         with open(qss_file, 'r') as f:
-            style = f.read()
-            self.setStyleSheet(style)
+            self.setStyleSheet(f.read())
         
         # Initialize timers
         self.countdown_timer = QTimer(self)

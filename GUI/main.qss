@@ -1,0 +1,555 @@
+/* ==========================================
+   GLOBAL STYLES
+   ========================================== */
+QMainWindow {
+    background-color: #f5f6fa;
+}
+
+QDialog {
+    background-color: #f5f6fa;
+}
+
+/* Labels - Global Style */
+QLabel {
+    color: #424242;
+    font-size: 14px;
+}
+
+/* Buttons - Global Style */
+QPushButton {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    background-color: #2980b9;
+}
+
+QPushButton:pressed {
+    background-color: #2472a4;
+}
+
+QPushButton:checked {
+    background-color: #2c3e50;
+}
+
+QPushButton:disabled {
+    background-color: #bdc3c7;
+    color: #7f8c8d;
+}
+
+/* Line Edits - Global Style */
+QLineEdit {
+    padding: 8px;
+    border: 2px solid #e1e5ee;
+    border-radius: 4px;
+    background-color: white;
+    color: #2c3e50;
+}
+
+QLineEdit:focus {
+    border-color: #3498db;
+}
+
+QLineEdit:hover {
+    border-color: #bdc3c7;
+}
+
+/* List Widgets - Global Style */
+QListWidget, QListView {
+    background-color: white;
+    border: 2px solid #e1e5ee;
+    border-radius: 6px;
+    padding: 5px;
+}
+
+QListWidget::item, QListView::item {
+    padding: 8px;
+    border-radius: 4px;
+    margin: 2px;
+}
+
+QListWidget::item:selected, QListView::item:selected {
+    background-color: #3498db;
+    color: white;
+}
+
+QListWidget::item:hover:!selected, QListView::item:hover:!selected {
+    background-color: #f0f2f5;
+}
+
+/* Scroll Bars - Global Style */
+QScrollBar:vertical {
+    border: none;
+    background: #f0f2f5;
+    width: 10px;
+    border-radius: 5px;
+    margin: 0;
+}
+
+QScrollBar::handle:vertical {
+    background: #bdc3c7;
+    border-radius: 5px;
+    min-height: 20px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #95a5a6;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0;
+}
+
+/* ==========================================
+   SETTINGS PAGE STYLES
+   ========================================== */
+/* Settings Tab */
+#settings_tab {
+    background-color: #f5f5f5;
+}
+
+/* Profile Section */
+QGroupBox {
+    background-color: #ffffff;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    margin-top: 1.5em;
+    padding: 5px;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    color: #424242;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Settings Labels */
+#label, #label_2, #label_3 {
+    color: #3d3d3d;
+    font-size: 18px;
+}
+
+QLabel#username_lbl {
+    color: #1976D2;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 10px 0;
+}
+
+/* Settings Specific Buttons */
+QPushButton.settings-button {
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: bold;
+    min-width: 180px;
+    margin: 5px;
+}
+
+QPushButton.settings-button:hover {
+    background-color: #1976D2;
+}
+
+QPushButton.settings-button.logout {
+    background-color: #F44336;
+}
+
+QPushButton.settings-button.logout:hover {
+    background-color: #D32F2F;
+}
+
+/* Navigation Buttons */
+#general_btn,
+#accountDetails_btn,
+#accPartners_btn {
+    background-color: transparent;
+    color: #424242;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 24px;
+    font-size: 14px;
+    text-align: left;
+    margin: 2px 0;
+    border-left: 3px solid transparent;
+}
+
+#general_btn:hover,
+#accountDetails_btn:hover,
+#accPartners_btn:hover {
+    background-color: #E3F2FD;
+    color: #1976D2;
+}
+
+#general_btn:checked,
+#accountDetails_btn:checked,
+#accPartners_btn:checked {
+    background-color: #E3F2FD;
+    color: #1976D2;
+    font-weight: bold;
+    border-left: 3px solid #1976D2;
+}
+
+/* Toggle Switches */
+QCheckBox:not(#listWidget_2 QCheckBox) {
+    spacing: 8px;
+}
+
+QCheckBox:not(#listWidget_2 QCheckBox)::indicator {
+    width: 24px;
+    height: 12px;
+    border-radius: 6px;
+    background-color: #e0e0e0;
+}
+
+QCheckBox:not(#listWidget_2 QCheckBox)::indicator:checked {
+    background-color: #2196F3;
+}
+
+/* Normal Checkboxes for listWidget_2 */
+#listWidget_2 QCheckBox {
+    spacing: 5px;
+}
+
+#listWidget_2 QCheckBox::indicator {
+    width: 13px;
+    height: 13px;
+    border: 1px solid #90caf9;
+    border-radius: 2px;
+    background-color: white;
+}
+
+#listWidget_2 QCheckBox::indicator:checked {
+    background-color: #90caf9;
+    image: url(check.png);
+}
+
+#listWidget_2 QCheckBox::indicator:hover {
+    border-color: #1976d2;
+}
+
+/* ==========================================
+   SIGN UP PAGE STYLES
+   ========================================== */
+/* Main Window */
+QMainWindow#SignUpWindow {
+    background-color: #fff;
+}
+
+/* Left Widget */
+QWidget#left_wdgt {
+    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, 
+                                    stop:0 rgba(83, 176, 230, 255), 
+                                    stop:1 rgba(19, 102, 202, 255));
+}
+
+/* Right Widget */
+QWidget#right_wdgt {
+    background-color: #fff;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    color: #2ecc71;
+}
+
+/* Sign Up Page Elements */
+#signup_pg {
+    background-color: transparent;
+}
+
+#verify_pg {
+    background-color: white;
+    border-radius: 10px;
+}
+
+/* Sign Up Input Fields */
+#name_lineEdit, #email_lineEdit, #pass_lineEdit {
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 20px;
+    color: #2c3e50;
+    margin: 5px 0;
+}
+
+/* Verification Code Fields */
+#lineEdit, #lineEdit_2, #lineEdit_3, #lineEdit_4, #lineEdit_5, #lineEdit_6 {
+    font-size: 24px;
+    width: 45px;
+    height: 45px;
+    border: 2px solid #3498db;
+    border-radius: 8px;
+    background-color: white;
+    text-align: center;
+}
+
+/* Sign Up Button */
+#signUp_btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 15px 30px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+#signUp_btn:hover {
+    background-color: #2980b9;
+}
+
+/* Verify Button */
+#verify_btn {
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#verify_btn:hover {
+    background-color: #27ae60;
+}
+
+/* Resend Button */
+#resend_btn {
+    background-color: transparent;
+    color: #3498db;
+    border: 1px solid #3498db;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 14px;
+}
+
+#resend_btn:hover {
+    background-color: #f5f5f5;
+    color: #2980b9;
+}
+
+#resend_btn:disabled {
+    background-color: #f5f5f5;
+    color: #bdc3c7;
+    border-color: #bdc3c7;
+}
+
+/* Sign Up Labels */
+#welcom_lbl {
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+#appName_lbl {
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+#msg_lbl {
+    color: #ffffff;
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+#signUp_lbl {
+    color: #056475;
+    font-size: 40px;
+    font-weight: bold;
+    margin-bottom: 40px;
+    letter-spacing: 3px;
+}
+
+#timer_lbl {
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+/* ==========================================
+   BLOCK SCREEN STYLES
+   ========================================== */
+/* Block Screen Dialog */
+QDialog#BlockScreen {
+    background-color: #221b1b;
+}
+
+/* Block Screen Labels */
+#title_lbl {
+    font-size: 60px;
+    color: #a10000;
+    background-color: rgb(196, 174, 174);
+    border-bottom-left-radius: 25px;
+    border-top-left-radius: 0;
+    border-bottom-right-radius: 25px;
+    border-top-right-radius: 0;
+    width: 100%;
+}
+
+#blkRsn_lbl {
+    background-color: #5e3434;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px;
+    font-size: 18px;
+    color: #ECF0F1;
+}
+
+#block_message_label {
+    background-color: #2c2121;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #ECF0F1;
+}
+
+#countdown_label {
+    color: #e74c3c;
+    font-size: 24px;
+    font-weight: bold;
+    background-color: #2c2121;
+    border-radius: 10px;
+    padding: 15px 30px;
+    margin: 10px;
+}
+
+/* Block Screen Buttons */
+#redirect_btn {
+    background-color: #27ae60;
+    margin: 15px;
+}
+
+#redirect_btn:hover {
+    background-color: #219a52;
+}
+
+/* Block Screen Text Browser */
+QTextBrowser#msg_txtBrwsr {
+    background-color: rgba(46, 32, 32, 0.95);
+    border: 2px solid #702c2c;
+    color: #ECF0F1;
+    line-height: 1.6;
+    padding: 20px;
+    border-radius: 15px;
+    margin: 10px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 20px;
+}
+
+/* Block Screen Scrollbar */
+QTextBrowser#msg_txtBrwsr QScrollBar:vertical {
+    border: none;
+    background: #3a2828;
+    width: 10px;
+    margin: 0;
+}
+
+QTextBrowser#msg_txtBrwsr QScrollBar::handle:vertical {
+    background: #702c2c;
+    min-height: 20px;
+    border-radius: 5px;
+}
+
+QTextBrowser#msg_txtBrwsr QScrollBar::add-line:vertical,
+QTextBrowser#msg_txtBrwsr QScrollBar::sub-line:vertical {
+    height: 0;
+}
+
+/* ==========================================
+   TAB WIDGET STYLES
+   ========================================== */
+QTabWidget::pane {
+    border: none;
+    background: #ffffff;
+    border-radius: 8px;
+}
+
+QTabWidget::tab-bar {
+    alignment: left;
+}
+
+QTabBar::tab {
+    background: #e1e5ee;
+    color: #2c3e50;
+    min-width: 100px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    margin: 2px;
+}
+
+QTabBar::tab:selected {
+    background: #3498db;
+    color: white;
+}
+
+QTabBar::tab:hover:!selected {
+    background: #bdc3c7;
+}
+
+/* ==========================================
+   STATUS BAR STYLES
+   ========================================== */
+QStatusBar {
+    background-color: #ffffff;
+    color: #2c3e50;
+    border-top: 1px solid #e1e5ee;
+}
+
+/* ==========================================
+   MESSAGE BOX STYLES
+   ========================================== */
+QMessageBox {
+    background-color: #f5f6fa;
+}
+
+QMessageBox QPushButton {
+    min-width: 80px;
+}
+
+/* ==========================================
+   CODE INPUT STYLES
+   ========================================== */
+QLineEdit[codeInput="true"] {
+    font-size: 20px;
+    text-align: center;
+    font-weight: bold;
+    min-width: 40px;
+    min-height: 40px;
+}
+
+/* ==========================================
+   FOCUS TIMER STYLES
+   ========================================== */
+/* Focus Timer specific group box */
+#focusTimer_groupBox {
+    border: 2px solid #FF9800;
+    border-radius: 8px;
+    padding: 8px;
+}
+
+/* Focus Timer specific labels */
+#focusTimer_groupBox QLabel {
+    color: #444;
+    font-size: 14px;
+}
+
+/* Focus Timer specific buttons */
+#focusTimer_groupBox QPushButton {
+    background: #FFF3E0;
+    border: 1px solid #FF9800;
+    border-radius: 6px;
+}

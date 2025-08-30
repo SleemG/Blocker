@@ -26,8 +26,8 @@ class SignUpDialog(QMainWindow):
             raise FileNotFoundError(f"UI file not found at {ui_file}")
         loadUi(ui_file, self)
         
-        # Load modern stylesheet
-        style_file = os.path.join(gui_dir, 'modern_style.qss')
+        # Load main stylesheet
+        style_file = os.path.join(gui_dir, 'main.qss')
         if not os.path.exists(style_file):
             raise FileNotFoundError(f"Style file not found at {style_file}")
         with open(style_file, "r") as f:
