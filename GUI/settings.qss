@@ -128,18 +128,40 @@ QLineEdit:focus {
     border-color: #2196F3;
 }
 
-/* Toggle switches */
-QCheckBox {
+/* Toggle switches (except for listWidget_2) */
+QCheckBox:not(#listWidget_2 QCheckBox) {
     spacing: 8px;
 }
 
-QCheckBox::indicator {
+QCheckBox:not(#listWidget_2 QCheckBox)::indicator {
     width: 24px;
     height: 12px;
     border-radius: 6px;
     background-color: #e0e0e0;
 }
 
-QCheckBox::indicator:checked {
+QCheckBox:not(#listWidget_2 QCheckBox)::indicator:checked {
     background-color: #2196F3;
+}
+
+/* Normal checkboxes for listWidget_2 */
+#listWidget_2 QCheckBox {
+    spacing: 5px;
+}
+
+#listWidget_2 QCheckBox::indicator {
+    width: 13px;
+    height: 13px;
+    border: 1px solid #90caf9;
+    border-radius: 2px;
+    background-color: white;
+}
+
+#listWidget_2 QCheckBox::indicator:checked {
+    background-color: #90caf9;
+    image: url(check.png);
+}
+
+#listWidget_2 QCheckBox::indicator:hover {
+    border-color: #1976d2;
 }

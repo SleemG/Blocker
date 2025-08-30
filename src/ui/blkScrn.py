@@ -15,21 +15,19 @@ except ImportError:
 import webbrowser
 
 class BlockScreen(QtWidgets.QDialog):
-    # Class-level variables to track last shown time
-    last_shown_time = 0
-    DELAY_SECONDS = 5
+    # Class-level variables to track cooldown
+    _cooldown_end_time = 0
+    COOLDOWN_SECONDS = 5
     
     @classmethod
-    def can_show_screen(cls):
-        """Check if enough time has passed since last shown"""
-        current_time = time.time()
-        time_passed = current_time - cls.last_shown_time
-        return time_passed >= cls.DELAY_SECONDS or cls.last_shown_time == 0
+    def is_in_cooldown(cls):
+        """Check if we're in the cooldown period"""
+        return time.time() < cls._cooldown_end_time
     
     @classmethod
-    def update_last_shown(cls):
-        """Update the last shown time"""
-        cls.last_shown_time = time.time()
+    def start_cooldown(cls):
+        """Start the cooldown period after screen closes"""
+        cls._cooldown_end_time = time.time() + cls.COOLDOWN_SECONDS
     
     def __init__(self, user_email=None):
         super().__init__(None)  # Pass None as parent to ensure top-level window
@@ -40,10 +38,11 @@ class BlockScreen(QtWidgets.QDialog):
         self.prevent_close = True
         self.initialized = False  # Track initialization state
         
-        if not BlockScreen.can_show_screen():
-            remaining_wait = BlockScreen.DELAY_SECONDS - (time.time() - BlockScreen.last_shown_time)
-            print(f"Please wait {remaining_wait:.1f} seconds before showing block screen again")
-            QtCore.QTimer.singleShot(0, self.close)  # Defer close to prevent blank window
+        # Check if we're in cooldown period
+        if BlockScreen.is_in_cooldown():
+            remaining = round(BlockScreen._cooldown_end_time - time.time(), 1)
+            print(f"In cooldown period. Please wait {remaining} seconds.")
+            self.close()
             return
             
         # Ensure proper window setup
@@ -57,7 +56,7 @@ class BlockScreen(QtWidgets.QDialog):
             QtCore.Qt.WindowStaysOnTopHint |  # Always on top
             QtCore.Qt.X11BypassWindowManagerHint  # Bypass window manager
         )
-        BlockScreen.update_last_shown()  # Update last shown time
+        BlockScreen.start_cooldown()  # Start the cooldown period
 
         # Get the directory containing the current script
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -239,7 +238,7 @@ class BlockScreen(QtWidgets.QDialog):
         finally:
             # Ensure window is hidden and destroyed
             self.hide()
-            BlockScreen.update_last_shown()  # Update last shown time
+            BlockScreen.start_cooldown()  # Start the cooldown period
             self.close()
             self.deleteLater()  # Ensure proper cleanup
 
@@ -259,7 +258,8 @@ class BlockScreen(QtWidgets.QDialog):
             return
             
         print("Block screen closing...")
-        BlockScreen.update_last_shown()  # Update last shown time when closing
+        # Start cooldown period when actually closing
+        BlockScreen.start_cooldown()
         
         # Stop all timers
         if hasattr(self, 'countdown_timer'):
@@ -315,11 +315,26 @@ class BlockScreen(QtWidgets.QDialog):
 
     def show_status_message(self, message: str):
         """Show a temporary status message"""
-        if hasattr(self, 'close_btn'):
+        if not hasattr(self, 'close_btn'):
+            return
+            
+        try:
             original_text = self.close_btn.text()
             self.close_btn.setText(message)
-            # Reset the text after 2 seconds
-            QTimer.singleShot(2000, lambda: self.close_btn.setText(original_text))
+            
+            # Reset the text after 2 seconds, but only if the button still exists
+            def restore_text():
+                try:
+                    if hasattr(self, 'close_btn'):
+                        self.close_btn.setText(original_text)
+                except RuntimeError:
+                    # Button was already destroyed, ignore
+                    pass
+                    
+            QTimer.singleShot(2000, restore_text)
+        except RuntimeError:
+            # Button was already destroyed when trying to set initial message
+            pass
 
     def toggle_label(self):
         """Toggle visibility of block reason label with animation"""

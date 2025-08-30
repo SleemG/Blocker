@@ -14,7 +14,7 @@ from ..utils.helpers import fade_in_widget, slide_widget
 
 from .focus_mode_manager import FocusModeManager
 
-from .ui_components import (FloatingButton, FloatingButtonManager, 
+from .ui_components import (FloatingButton, SimpleToggleSwitch, 
                           CustomNotification, FloatingPanel, ToggleSwitch)
 from .partner_dialog import PartnerDialog
 from .app_selector import ProgramLoader, ProgramListItem
@@ -730,7 +730,7 @@ class MainWindow(QMainWindow):
             label.setStyleSheet("color: #424242; font-size: 14px;")
             
             # Create toggle switch
-            toggle = ToggleSwitch(width=50, height=25)
+            toggle = ToggleSwitch()
             toggle.setChecked(old_checkbox.isChecked())
             
             # Add to horizontal layout

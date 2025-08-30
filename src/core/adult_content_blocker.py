@@ -247,6 +247,7 @@ class BrowserMonitor(QThread):
         self.content_analyzer = ContentAnalyzer()
         self.is_monitoring = False
         self.last_urls = {}  # Track last URLs for each browser
+        self.check_interval = 2  # Check every 2 seconds instead of every second
         
         # Connect content analyzer signals
         self.content_analyzer.content_detected.connect(
@@ -277,7 +278,7 @@ class BrowserMonitor(QThread):
                         print(f"Checking window: {window_info['title']}")
                         self.check_browser_content(window_info)
                 
-                time.sleep(1)  # Check every second
+                time.sleep(self.check_interval)  # Check less frequently
                 
             except Exception as e:
                 print(f"Error in browser monitoring: {e}")
@@ -498,43 +499,112 @@ class AdultContentBlocker(QObject):
         else:
             print("Browser monitor thread already running")
         
+    def __init__(self, database, user_email):
+        super().__init__()
+        print("Initializing AdultContentBlocker...")
+        self.database = database
+        self.user_email = user_email
+        self.current_block_screen = None
+        self.block_screen_showing = False  # New flag to track block screen state
+        self.content_analyzer = ContentAnalyzer()
+        
+        # Create browser monitor
+        self.settings_manager = SettingsManager(database, user_email)
+        self.browser_monitor = BrowserMonitor(database, user_email)
+        
+        # Connect signals
+        self.browser_monitor.content_blocked.connect(self.handle_detected_content)
+        self.content_analyzer.content_detected.connect(self.handle_detected_content)
+        
+        # Start monitoring automatically
+        print("Starting monitoring automatically...")
+        self.start_blocking()
+
+    def __init__(self, database, user_email):
+        super().__init__()
+        print("Initializing AdultContentBlocker...")
+        self.database = database
+        self.user_email = user_email
+        self.current_block_screen = None
+        self.content_analyzer = ContentAnalyzer()
+        
+        # Create browser monitor
+        self.settings_manager = SettingsManager(database, user_email)
+        self.browser_monitor = BrowserMonitor(database, user_email)
+        
+        # Connect signals
+        self.browser_monitor.content_blocked.connect(self.handle_detected_content)
+        self.content_analyzer.content_detected.connect(self.handle_detected_content)
+        
+        # Start monitoring automatically
+        print("Starting monitoring automatically...")
+        self.start_blocking()
+
     def handle_detected_content(self, url: str, reason: str, detected_content: str = ""):
         """Handle detected adult content"""
         print(f"Content detected - URL: {url}, Reason: {reason}, Content: {detected_content}")
         
-        # Don't create a new block screen if one is already showing
+        # If a block screen is already showing, don't create a new one
         if self.current_block_screen is not None:
-            print("Block screen already showing, skipping...")
-            return
-            
+            try:
+                if not self.current_block_screen.isHidden():
+                    print("Block screen already active")
+                    return
+            except RuntimeError:
+                self.current_block_screen = None
+                
         try:
+            # Create new block screen
             print("Creating block screen...")
             self.current_block_screen = BlockScreen(user_email=self.user_email)
             
+            # If block screen indicates it's not ready (in cooldown), return
+            if not getattr(self.current_block_screen, 'initialized', False):
+                print("Block screen not ready (in cooldown)")
+                self.current_block_screen = None
+                return
+                
             # Set the reason text
             if hasattr(self.current_block_screen, 'blkRsn_lbl'):
                 self.current_block_screen.blkRsn_lbl.setText(f"Blocked: {url}\nReason: {reason}")
-                # self.current_block_screen.blkRsn_lbl.show()
+                
+            # Define cleanup handler
+            def on_block_screen_finished():
+                print("Block screen finished, cleaning up")
+                if self.current_block_screen:
+                    self.current_block_screen = None
+                    
+            # Connect cleanup handler
+            self.current_block_screen.finished.connect(on_block_screen_finished)
+            
+            # Show the block screen modally
             print("Showing block screen...")
-            self.current_block_screen.show()
-            self.current_block_screen.activateWindow()
-            self.current_block_screen.raise_()
-            result = self.current_block_screen.exec_()
-            print(f"Block screen closed with result: {result}")
-            if self.current_block_screen:
-                self.current_block_screen.deleteLater()
-                self.current_block_screen = None
+            self.current_block_screen.exec_()
+            
         except Exception as e:
             print(f"Error showing block screen: {e}")
             import traceback
             print(traceback.format_exc())
-            # Clean up on error
             if self.current_block_screen:
                 try:
-                    self.current_block_screen.deleteLater()
+                    self.current_block_screen.close()
                 except:
                     pass
                 self.current_block_screen = None
+    
+    def _cleanup_block_screen(self):
+        """Clean up the block screen safely"""
+        if self.current_block_screen is not None:
+            try:
+                print("Cleaning up block screen...")
+                if hasattr(self.current_block_screen, 'close'):
+                    self.current_block_screen.close()
+                self.current_block_screen.deleteLater()
+            except Exception as e:
+                print(f"Error during cleanup: {e}")
+            finally:
+                self.current_block_screen = None
+                print("Block screen cleanup complete")
     
     def stop_blocking(self):
         """Stop the content blocking system"""
